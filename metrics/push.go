@@ -18,6 +18,10 @@ func NewMetrics(prometheusGauge prometheus.GaugeVec) Metrics {
 	return m
 }
 
+func pushgatewayUrl(address string, port string) string {
+	return "http://" + address + ":" + port
+}
+
 func (m *metrics) Push() {
 
 }

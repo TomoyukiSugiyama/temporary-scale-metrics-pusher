@@ -1,37 +1,35 @@
 package metrics
 
-import (
-	prometheusv1 "github.com/prometheus/client_golang/api/prometheus/v1"
-)
-
 type Metrics interface {
 	Push()
 }
 
 type TemporaryScaleMetrics struct {
-	conditionId   string
-	conditionType string
-	duration      string
+	ConditionId   string
+	ConditionType string
+	Duration      string
+	MetricValue   string
 }
 
 type pusher struct {
-	prometheusApi         prometheusv1.API
+	prometheusUrl         string
 	temporaryScaleMetrics TemporaryScaleMetrics
 }
 
-func NewMetrics(prometheusApi prometheusv1.API) Metrics {
-	tsm := TemporaryScaleMetrics{
-		conditionId:   "9-22",
-		conditionType: "training",
-		duration:      "9-22",
-	}
+func NewMetrics(prometheusUrl string, tsm TemporaryScaleMetrics) Metrics {
 
-	p := &pusher{prometheusApi: prometheusApi,
+	p := &pusher{
+		prometheusUrl:         prometheusUrl,
 		temporaryScaleMetrics: tsm,
 	}
+
 	return p
 }
 
 func (p *pusher) Push() {
 
+}
+
+func (p *pusher) jobName() string {
+	return "temporary_scale_job_" + p.temporaryScaleMetrics.ConditionId + "_" + p.temporaryScaleMetrics.ConditionType
 }

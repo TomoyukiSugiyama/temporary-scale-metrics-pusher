@@ -9,3 +9,7 @@ func main() {
 	flag.StringVar(&pushgatewayPort, "pushgateway-port", "9091", "port number for pushgateway")
 	flag.Parse()
 }
+
+func pushgatewayUrl(address string, port string) string {
+	return "http://" + address + ":" + port
+}

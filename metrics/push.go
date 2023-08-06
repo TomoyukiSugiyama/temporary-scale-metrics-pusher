@@ -14,9 +14,9 @@ type metrics struct {
 	prometheusApi       prometheusv1.API
 }
 
-func NewMetrics(prometheusGauge prometheus.GaugeVec) Metrics {
+func NewMetrics(prometheusApi prometheusv1.API) Metrics {
 
-	m := &metrics{temporaryScaleGauge: prometheusGauge}
+	m := &metrics{prometheusApi: prometheusApi}
 	return m
 }
 

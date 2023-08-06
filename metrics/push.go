@@ -12,14 +12,14 @@ type TemporaryScaleMetrics struct {
 }
 
 type pusher struct {
-	prometheusUrl         string
+	pushgatewayUrl        string
 	temporaryScaleMetrics TemporaryScaleMetrics
 }
 
-func NewMetrics(prometheusUrl string, tsm TemporaryScaleMetrics) Metrics {
+func NewMetrics(pushgatewayUrl string, tsm TemporaryScaleMetrics) Metrics {
 
 	p := &pusher{
-		prometheusUrl:         prometheusUrl,
+		pushgatewayUrl:        pushgatewayUrl,
 		temporaryScaleMetrics: tsm,
 	}
 

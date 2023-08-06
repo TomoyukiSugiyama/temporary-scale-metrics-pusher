@@ -4,8 +4,6 @@ import (
 	"flag"
 
 	metricspkg "github.com/TomoyukiSugiyama/temporary-scale-metrics-pusher/metrics"
-	prometheusapi "github.com/prometheus/client_golang/api"
-	prometheusv1 "github.com/prometheus/client_golang/api/prometheus/v1"
 )
 
 func main() {
@@ -15,12 +13,13 @@ func main() {
 	flag.StringVar(&pushgatewayPort, "pushgateway-port", "9091", "port number for pushgateway")
 	flag.Parse()
 
-	client, err := prometheusapi.NewClient(prometheusapi.Config{Address: pushgatewayUrl(pushgatewayAddr, pushgatewayPort)})
-	if err != nil {
-
+	tsm := metricspkg.TemporaryScaleMetrics{
+		ConditionId:   "9-22",
+		ConditionType: "training",
+		Duration:      "9-22",
+		MetricValue:   "0",
 	}
-	api := prometheusv1.NewAPI(client)
-	pusher := metricspkg.NewMetrics(api)
+	pusher := metricspkg.NewMetrics(pushgatewayUrl(pushgatewayAddr, pushgatewayPort), tsm)
 	pusher.Push()
 }
 

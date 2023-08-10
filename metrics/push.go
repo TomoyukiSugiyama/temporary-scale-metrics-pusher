@@ -1,5 +1,9 @@
 package metrics
 
+import (
+	"github.com/prometheus/client_golang/prometheus"
+)
+
 type Metrics interface {
 	Push()
 }
@@ -12,15 +16,22 @@ type TemporaryScaleMetrics struct {
 }
 
 type pusher struct {
-	pushgatewayUrl        string
-	temporaryScaleMetrics TemporaryScaleMetrics
+	pushgatewayUrl string
+	tsm            TemporaryScaleMetrics
+	gauge          prometheus.Gauge
 }
 
 func NewMetrics(pushgatewayUrl string, tsm TemporaryScaleMetrics) Metrics {
+	temporaryScaleGauge := prometheus.NewGauge(prometheus.GaugeOpts{
+		Name:        "temporary_scale",
+		Help:        "temporary scale",
+		ConstLabels: prometheus.Labels{"id": tsm.ConditionId, "type": tsm.ConditionType},
+	})
 
 	p := &pusher{
-		pushgatewayUrl:        pushgatewayUrl,
-		temporaryScaleMetrics: tsm,
+		pushgatewayUrl: pushgatewayUrl,
+		tsm:            tsm,
+		gauge:          temporaryScaleGauge,
 	}
 
 	return p
@@ -31,5 +42,5 @@ func (p *pusher) Push() {
 }
 
 func (p *pusher) jobName() string {
-	return "temporary_scale_job_" + p.temporaryScaleMetrics.ConditionId + "_" + p.temporaryScaleMetrics.ConditionType
+	return "temporary_scale_job_" + p.tsm.ConditionId + "_" + p.tsm.ConditionType
 }

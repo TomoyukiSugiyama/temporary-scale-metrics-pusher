@@ -2,6 +2,7 @@ package metrics
 
 import (
 	"strings"
+	"time"
 
 	"github.com/prometheus/client_golang/prometheus"
 )
@@ -18,13 +19,16 @@ type TemporaryScaleMetrics struct {
 }
 
 type pusher struct {
+	currentTime    time.Time
 	pushgatewayUrl string
 	tsm            TemporaryScaleMetrics
 	gauge          prometheus.Gauge
 	jobName        string
 }
 
-func NewMetrics(pushgatewayUrl string, tsm TemporaryScaleMetrics) Metrics {
+type PusherOption func(*pusher)
+
+func NewMetrics(pushgatewayUrl string, tsm TemporaryScaleMetrics, opts ...PusherOption) Metrics {
 	const jobNamePrefix = "temporary_scale_job"
 	temporaryScaleGauge := prometheus.NewGauge(prometheus.GaugeOpts{
 		Name:        "temporary_scale",
@@ -41,7 +45,16 @@ func NewMetrics(pushgatewayUrl string, tsm TemporaryScaleMetrics) Metrics {
 		jobName:        jobName,
 	}
 
+	for _, opt := range opts {
+		opt(p)
+	}
 	return p
+}
+
+func (p *pusher) WithDate(year int, month time.Month, day int) PusherOption {
+	return func(p *pusher) {
+		p.currentTime = time.Date(year, month, day, 9, 0, 0, 0, time.Local)
+	}
 }
 
 func (p *pusher) Push() {

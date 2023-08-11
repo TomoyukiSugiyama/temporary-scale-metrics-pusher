@@ -19,6 +19,7 @@ type pusher struct {
 	pushgatewayUrl string
 	tsm            TemporaryScaleMetrics
 	gauge          prometheus.Gauge
+	jobName        string
 }
 
 func NewMetrics(pushgatewayUrl string, tsm TemporaryScaleMetrics) Metrics {
@@ -27,11 +28,12 @@ func NewMetrics(pushgatewayUrl string, tsm TemporaryScaleMetrics) Metrics {
 		Help:        "temporary scale",
 		ConstLabels: prometheus.Labels{"id": tsm.ConditionId, "type": tsm.ConditionType},
 	})
-
+	jobName := "temporary_scale_job_" + tsm.ConditionId + "_" + tsm.ConditionType
 	p := &pusher{
 		pushgatewayUrl: pushgatewayUrl,
 		tsm:            tsm,
 		gauge:          temporaryScaleGauge,
+		jobName:        jobName,
 	}
 
 	return p
@@ -39,8 +41,4 @@ func NewMetrics(pushgatewayUrl string, tsm TemporaryScaleMetrics) Metrics {
 
 func (p *pusher) Push() {
 
-}
-
-func (p *pusher) jobName() string {
-	return "temporary_scale_job_" + p.tsm.ConditionId + "_" + p.tsm.ConditionType
 }

@@ -34,7 +34,7 @@ func main() {
 
 func pushgatewayUrl(address string, port string) string {
 	httpURL := &url.URL{
-		Scheme: "https",
+		Scheme: "http",
 		Host:   fmt.Sprintf("%s:%s", address, port),
 	}
 	return httpURL.String()

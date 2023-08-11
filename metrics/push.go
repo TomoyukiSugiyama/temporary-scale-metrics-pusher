@@ -2,11 +2,13 @@ package metrics
 
 import (
 	"errors"
+	"fmt"
 	"strconv"
 	"strings"
 	"time"
 
 	"github.com/prometheus/client_golang/prometheus"
+	"github.com/prometheus/client_golang/prometheus/push"
 )
 
 type Metrics interface {
@@ -32,6 +34,8 @@ type PusherOption func(*pusher)
 
 func NewMetrics(pushgatewayUrl string, tsm TemporaryScaleMetrics, opts ...PusherOption) Metrics {
 	const jobNamePrefix = "temporary_scale_job"
+	currentTime := time.Now()
+
 	temporaryScaleGauge := prometheus.NewGauge(prometheus.GaugeOpts{
 		Name:        "temporary_scale",
 		Help:        "temporary scale",
@@ -41,6 +45,7 @@ func NewMetrics(pushgatewayUrl string, tsm TemporaryScaleMetrics, opts ...Pusher
 	jobName := strings.Join([]string{jobNamePrefix, tsm.ConditionId, tsm.ConditionType}, "_")
 
 	p := &pusher{
+		currentTime:    currentTime,
 		pushgatewayUrl: pushgatewayUrl,
 		tsm:            tsm,
 		gauge:          temporaryScaleGauge,
@@ -81,5 +86,9 @@ func (p *pusher) calcurateMetricValue() error {
 }
 
 func (p *pusher) Push() {
-
+	if err := push.New(p.pushgatewayUrl, p.jobName).
+		Collector(p.gauge).
+		Push(); err != nil {
+		fmt.Printf(err.Error())
+	}
 }

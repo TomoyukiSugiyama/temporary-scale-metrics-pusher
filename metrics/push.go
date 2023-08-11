@@ -1,6 +1,8 @@
 package metrics
 
 import (
+	"errors"
+	"strconv"
 	"strings"
 	"time"
 
@@ -15,7 +17,7 @@ type TemporaryScaleMetrics struct {
 	ConditionId   string
 	ConditionType string
 	Duration      string
-	MetricValue   string
+	MetricValue   float64
 }
 
 type pusher struct {
@@ -51,10 +53,31 @@ func NewMetrics(pushgatewayUrl string, tsm TemporaryScaleMetrics, opts ...Pusher
 	return p
 }
 
-func (p *pusher) WithDate(year int, month time.Month, day int) PusherOption {
+func WithDate(year int, month time.Month, day int, hour int) PusherOption {
 	return func(p *pusher) {
-		p.currentTime = time.Date(year, month, day, 9, 0, 0, 0, time.Local)
+		p.currentTime = time.Date(year, month, day, hour, 0, 0, 0, time.Local)
 	}
+}
+
+func (p *pusher) calcurateMetricValue() error {
+	timeRenge := strings.Split(p.tsm.Duration, "-")
+	if len(timeRenge) != 2 {
+		return errors.New("id is invalid format")
+	}
+	min, err := strconv.Atoi(timeRenge[0])
+	if err != nil {
+		return errors.New("duration is invalid format")
+	}
+	max, err := strconv.Atoi(timeRenge[1])
+	if err != nil {
+		return errors.New("duration is invalid format")
+	}
+	if min <= p.currentTime.Hour() && p.currentTime.Hour() <= max {
+		p.tsm.MetricValue = 1
+		return nil
+	}
+	p.tsm.MetricValue = 0
+	return nil
 }
 
 func (p *pusher) Push() {

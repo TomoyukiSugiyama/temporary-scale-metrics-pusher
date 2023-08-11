@@ -14,7 +14,7 @@ func main() {
 	var conditionId string
 	var conditionType string
 	var duration string
-	const metricValue = "0"
+	const metricValue = 0
 	flag.StringVar(&pushgatewayAddr, "pushgateway-address", "localhost", "ip address for pushgateway")
 	flag.StringVar(&pushgatewayPort, "pushgateway-port", "9091", "port number for pushgateway")
 	flag.StringVar(&conditionId, "condition-id", "9-22", "unique id for the temporary metric")

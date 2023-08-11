@@ -2,6 +2,8 @@ package main
 
 import (
 	"flag"
+	"fmt"
+	"net/url"
 
 	metricspkg "github.com/TomoyukiSugiyama/temporary-scale-metrics-pusher/metrics"
 )
@@ -31,5 +33,9 @@ func main() {
 }
 
 func pushgatewayUrl(address string, port string) string {
-	return "http://" + address + ":" + port
+	httpURL := &url.URL{
+		Scheme: "https",
+		Host:   fmt.Sprintf("%s:%s", address, port),
+	}
+	return httpURL.String()
 }

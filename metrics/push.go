@@ -34,7 +34,6 @@ type PusherOption func(*pusher)
 
 func NewMetrics(pushgatewayUrl string, tsm TemporaryScaleMetrics, opts ...PusherOption) Metrics {
 	const jobNamePrefix = "temporary_scale_job"
-	currentTime := time.Now()
 
 	temporaryScaleGauge := prometheus.NewGauge(prometheus.GaugeOpts{
 		Name:        "temporary_scale",
@@ -42,8 +41,8 @@ func NewMetrics(pushgatewayUrl string, tsm TemporaryScaleMetrics, opts ...Pusher
 		ConstLabels: prometheus.Labels{"id": tsm.ConditionId, "type": tsm.ConditionType},
 	})
 
+	currentTime := time.Now()
 	jobName := strings.Join([]string{jobNamePrefix, tsm.ConditionId, tsm.ConditionType}, "_")
-
 	p := &pusher{
 		currentTime:    currentTime,
 		pushgatewayUrl: pushgatewayUrl,
@@ -86,6 +85,8 @@ func (p *pusher) calcurateMetricValue() error {
 }
 
 func (p *pusher) Push() {
+	p.calcurateMetricValue()
+	p.gauge.Add(p.tsm.MetricValue)
 	if err := push.New(p.pushgatewayUrl, p.jobName).
 		Collector(p.gauge).
 		Push(); err != nil {

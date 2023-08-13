@@ -26,7 +26,6 @@ func main() {
 		ConditionId:   conditionId,
 		ConditionType: conditionType,
 		Duration:      duration,
-		MetricValue:   metricValue,
 	}
 	pusher := metricspkg.NewMetrics(pushgatewayUrl(pushgatewayAddr, pushgatewayPort), tsm)
 	pusher.Push()

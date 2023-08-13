@@ -19,7 +19,6 @@ type TemporaryScaleMetrics struct {
 	ConditionId   string
 	ConditionType string
 	Duration      string
-	MetricValue   float64
 }
 
 type pusher struct {
@@ -77,16 +76,16 @@ func (p *pusher) calcurateMetricValue() error {
 		return errors.New("duration is invalid format")
 	}
 	if min <= p.currentTime.Hour() && p.currentTime.Hour() <= max {
-		p.tsm.MetricValue = 1
+		p.gauge.Add(1)
 		return nil
 	}
-	p.tsm.MetricValue = 0
+	p.gauge.Add(0)
 	return nil
 }
 
 func (p *pusher) Push() {
 	p.calcurateMetricValue()
-	p.gauge.Add(p.tsm.MetricValue)
+
 	if err := push.New(p.pushgatewayUrl, p.jobName).
 		Collector(p.gauge).
 		Push(); err != nil {

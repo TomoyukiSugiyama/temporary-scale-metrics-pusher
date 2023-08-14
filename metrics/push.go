@@ -3,6 +3,7 @@ package metrics
 import (
 	"errors"
 	"fmt"
+	"log"
 	"strconv"
 	"strings"
 	"time"
@@ -34,6 +35,7 @@ type PusherOption func(*pusher)
 func NewMetrics(pushgatewayUrl string, tsm TemporaryScaleMetrics, opts ...PusherOption) Metrics {
 	const jobNamePrefix = "temporary_scale_job"
 
+	log.Printf("pushgateway_url=%s", pushgatewayUrl)
 	temporaryScaleGauge := prometheus.NewGauge(prometheus.GaugeOpts{
 		Name:        "temporary_scale",
 		Help:        "temporary scale",

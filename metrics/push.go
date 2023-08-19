@@ -66,7 +66,7 @@ func WithDate(year int, month time.Month, day int, hour int) PusherOption {
 func (p *pusher) calcurateMetricValue() error {
 	timeRenge := strings.Split(p.tsm.Duration, "-")
 	if len(timeRenge) != 2 {
-		return errors.New("id is invalid format")
+		return errors.New("duration is invalid format")
 	}
 	min, err := strconv.Atoi(timeRenge[0])
 	if err != nil {

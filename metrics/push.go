@@ -2,7 +2,6 @@ package metrics
 
 import (
 	"errors"
-	"fmt"
 	"log"
 	"strconv"
 	"strings"
@@ -86,11 +85,14 @@ func (p *pusher) calcurateMetricValue() error {
 }
 
 func (p *pusher) Push() {
-	p.calcurateMetricValue()
+	err := p.calcurateMetricValue()
+	if err != nil {
+		log.Fatal(err.Error())
+	}
 
 	if err := push.New(p.pushgatewayUrl, p.jobName).
 		Collector(p.gauge).
 		Push(); err != nil {
-		fmt.Printf(err.Error())
+		log.Fatal(err.Error())
 	}
 }
